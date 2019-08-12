@@ -1,1 +1,10 @@
-../../../templates/site.json
+{
+  "namespace": "TSI-CC",
+  "version": "0.0.0",
+  "headless": "true",
+  "ks_server": "http://localhost:8080/",
+  "disk_size": "8192",
+  "lang": "en_US.UTF-8",
+  "keyboard":  "us",
+  "timezone": "Europe/London"
+}
