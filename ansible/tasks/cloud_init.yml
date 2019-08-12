@@ -1,10 +1,10 @@
 ---
 - name: Install CloudInit
-  yum: name={{item}} state=latest enablerepo='*'
-  with_items:
-    - cloud-init
-    - cloud-utils
-    - cloud-utils-growpart
+  yum:
+    name:
+      - cloud-init
+      - cloud-utils-growpart
+    state: latest
 
 - name: Configure CloudInit
   template: dest=/etc/cloud/cloud.cfg.d/50_local.cfg src=templates/cloud_init_local.cfg.j2 mode=0644 owner=root group=root

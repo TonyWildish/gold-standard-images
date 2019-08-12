@@ -1,11 +1,11 @@
 ---
 - name: Install virtualbox dependencies
-  yum: name={{item}} state=present enablerepo='*'
-  with_items:
-    - kernel-devel-{{ansible_kernel}}
-    - gcc
-    - perl
-    - bzip2
+  yum:
+    name:
+      - kernel-devel-{{ansible_kernel}}
+      - gcc
+      - perl
+      - bzip2
 
 - name: Mount guest additions iso
   mount: name=/mnt src=/tmp/VBoxGuestAdditions.iso opts=loop,ro fstype=iso9660 state=mounted
@@ -24,5 +24,7 @@
 
 - name: Undo yum history
   shell: yum -y history undo last
+  args:
+    warn: no
 
-- include: tasks/vagrant_user.yml
+- import_tasks: tasks/vagrant_user.yml

@@ -22,12 +22,12 @@
   template: dest=/etc/yum.repos.d/google-cloud.repo src=templates/google-cloud.repo.j2 owner=root group=root mode=0644
 
 - name: Install packages
-  yum: name={{item}} state=latest enablerepo='*'
-  with_items:
-    - python
-    - google-compute-engine
-    - google-compute-engine-init
-    - google-config
+  yum:
+    name:
+      - python
+      - google-compute-engine
+      - google-compute-engine-init
+      - google-config
 
 - name: Secure sshd config
   lineinfile: dest=/etc/ssh/sshd_config regexp='^(#\s*)?{{item.key}}' line='{{item.key}} {{item.value}}' state=present owner=root group=root mode=0644

@@ -2,7 +2,7 @@
 # See http://docs.openstack.org/image-guide
 
 - name: Install ACPI service
-  yum: name=acpid state=latest enablerepo='*'
+  yum: name=acpid
 
 - name: Start ACPI service
   service: name=acpid enabled=yes state=started
@@ -26,4 +26,4 @@
   command: grub2-mkconfig -o /boot/grub2/grub.cfg
   when: grub.changed
 
-- include: tasks/cloud_init.yml
+- import_tasks: tasks/cloud_init.yml

@@ -36,14 +36,14 @@
   when: dracut.changed
 
 - name: Add repository for Azure agent
-  yum_repository: name=openlogic description="Openlogic's Azure agent'" baseurl=http://olcentgbl.trafficmanager.net/openlogic/{{ansible_distribution_version}}/openlogic/x86_64/ gpgcheck=yes gpgkey=http://olcentgbl.trafficmanager.net/openlogic/{{ansible_distribution_version}}/openlogic/x86_64/OpenLogic-GPG-KEY enabled=no state=present owner=root group=root mode=0644
+  yum_repository: name=openlogic description="Openlogic's Azure agent'" baseurl=http://olcentgbl.trafficmanager.net/openlogic/{{ansible_distribution_version}}/openlogic/x86_64/ gpgcheck=yes gpgkey=http://olcentgbl.trafficmanager.net/openlogic/{{ansible_distribution_version}}/openlogic/x86_64/OpenLogic-GPG-KEY enabled=yes state=present owner=root group=root mode=0644
 
 - name: Install Azure agent and dependencies
-  yum: name={{item}} state=present enablerepo='*'
-  with_items:
-    - python
-    - python-pyasn1
-    - WALinuxAgent
+  yum:
+    name:
+      - python
+      - python-pyasn1
+      - WALinuxAgent
 
 - name: Configure swap in Azure agent
   lineinfile: dest=/etc/waagent.conf regexp='^(#\s*)?{{item.key}}' line='{{item.key}}={{item.value}}' owner=root group=root mode=0644

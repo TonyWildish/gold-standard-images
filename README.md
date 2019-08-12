@@ -21,9 +21,8 @@ The system depends on four inputs, which are well known and maintained:
 
 ## OS
 
-- CentOS 7.2.1511
-- CentOS 7.3.1611
-- RedHat 7.2
+- CentOS 7.x
+- RedHat 7.x
 
 Note that OS name and versions are named after the values reported by `ansible_distribution` and `ansible_distribution_version`.
 
@@ -44,7 +43,7 @@ Read the [Bootstrapping](#bootstrapping) section below before attempting to buil
 
 Select the VM to build, ie:
 ``` sh
-vm_name=CentOS-7.2.1511
+vm_name=CentOS-7.6.1810
 ```
 
 And run Packer in parallel to generate images for all providers. Note that due to an incompatibility between VirtualBox and KVM running concurrently, builds need to be split:
@@ -186,14 +185,14 @@ Add:
 
 ### VirtualBox (`virtualbox`)
 
-The `virtualbox` provider uses the `virtualbox-iso` build type (see [virtualbox-iso](#virtualbox-iso) for dependencies). VirtualBox images are create to be used as Vagrant boxes (see [Vagrant](#vagrant)). A catalog metadata file can be used for each OS to manage Vagrant images. These files are located in `artifacts/`. An example can be found in `artifacts/CentOS-7.2.1511.json.example`. Referencing a catalog in a `Vagrantfile` will automatically import the last image or prompt for an upgrade if a newer version is found based on the data in the catalog. For example:
+The `virtualbox` provider uses the `virtualbox-iso` build type (see [virtualbox-iso](#virtualbox-iso) for dependencies). VirtualBox images are create to be used as Vagrant boxes (see [Vagrant](#vagrant)). A catalog metadata file can be used for each OS to manage Vagrant images. These files are located in `artifacts/`. An example can be found in `artifacts/CentOS-7.6.1810.json.example`. Referencing a catalog in a `Vagrantfile` will automatically import the last image or prompt for an upgrade if a newer version is found based on the data in the catalog. For example:
 
 ``` ruby
 # Vagrantfile
 
 Vagrant.configure(2) do |config|
-  config.vm.box = "namespace/CentOS-7.2.1511"
-  config.vm.box_url = 'file:///path/to/artifacts/CentOS-7.2.1511.json'
+  config.vm.box = "namespace/CentOS-7.6.1810"
+  config.vm.box_url = 'file:///path/to/artifacts/CentOS-7.6.1810.json'
 end
 ```
 
@@ -217,11 +216,11 @@ The build of an artifact for use in a cloud environment start with a Packer's te
 
 ## Packer Templates
 
-A standard Packer's JSON template for parallel generation of artifacts for different cloud providers is located in the `templates/main.json` alongside with a site specific template in `templates/site.json` and OS specific templates in directory `templates/os` (ie `CentOS-7.2.1511.json`).
+A standard Packer's JSON template for parallel generation of artifacts for different cloud providers is located in the `templates/main.json` alongside with a site specific template in `templates/site.json` and OS specific templates in directory `templates/os` (ie `CentOS-7.6.1810.json`).
 
 The main template declares a set of variables (`user variables` as per Packer). These variables are unset in the main template and instead should be set in the appropriate template (see below). Note that failure to set all variables declared with `null` in the main template will prevent the build process. Variables can also be overridden in command line (see above). Variables are divided into two types:
-- Site specific variables (for example namespace, versions, server urls, disk space and locale info) should be set in `templates/site.json` (an example is provided in `templates/site.json.example`).
-- OS specific variables (ie `os_name`, `os_version`, `iso` and `iso_checksum`, `iso_server` and `repo_server`). These should be set in the OS specific template under `templates/os` (an example is provided in `templates/os/CentOS-7.2.1511.json.example`).
+- Site specific variables (for example namespace, versions, server urls, disk space, locale info and root password) should be set in `templates/site.json` (an example is provided in `templates/site.json.example`).
+- OS specific variables (ie `os_name`, `os_version`, `iso` and `iso_checksum`, `iso_server` and `repo_server`). These should be set in the OS specific template under `templates/os` (an example is provided in `templates/os/CentOS-7.6.1810.json.example`).
 
 This setup provides flexibility in the image building process and allows site and os selection.
 
@@ -246,7 +245,7 @@ The kickstart system is divided in multiple files that get included depending on
 
 ### OS
 
-Multiple OS (and OS version) are supported by passing `os=name-version` in the URL to the kickstart server, ie `http://server.domain:port/ks.php?os=CentOS-7.2.1511`. Currently this is only used to pass the OS version to the kickstart scripts and generate the URL for the repository (see `http/includes/repo.php`).
+Multiple OS (and OS version) are supported by passing `os=name-version` in the URL to the kickstart server, ie `http://server.domain:port/ks.php?os=CentOS-7.6.1810`. Currently this is only used to pass the OS version to the kickstart scripts and generate the URL for the repository (see `http/includes/repo.php`).
 
 ### First Boot Options
 
@@ -274,7 +273,6 @@ Several shell scripts located in `scripts/` are run by each template to clean up
 
 Following is a tree of files compromising the system along with a brief description. To simplify the tree, only `CentOS` is listed here where multiple OS are possible, and only `aws` is listed where multiple builder/providers are possible. Note that items marked with `!VC` are not stored in version control (git). Also, files ending in `.example` will need to be copied into actual files as described in the relevant section in this document and those files should not be stored in version control.
 
-
 ```
 |-- ansible/                                      Ansible playbooks
 |   |-- site.yml                                  Main playbook for all Packer builds
@@ -287,28 +285,27 @@ Following is a tree of files compromising the system along with a brief descript
 |   `-- templates/                                Templates used by Ansible tasks
 |-- artifacts/                                    Artifacts (intermediate/end images)
 |   |-- 0.0.0/                                    Ordered by version
-|   |   `-- CentOS-7.2.1511/                        and OS
+|   |   `-- CentOS-7.6.1810/                        and OS
 |   |       `-- aws/                                and provider
 |   |           |-- SHA256SUM                       SHA256 checksum for all artifacts
-|   |           |-- CentOS-7.2.1511-0.0.0_aws.ova   Template specific artifact
-|   |           |-- CentOS-7.2.1511-0.0.0_aws.box   Vagrant box for debugging purposes
+|   |           |-- CentOS-7.6.1810-0.0.0_aws.ova   Template specific artifact
+|   |           |-- CentOS-7.6.1810-0.0.0_aws.box   Vagrant box for debugging purposes
 |   |           `-- ...                             Other files might be generated. Artifacts are not kept in VC
-|   `-- CentOS-7.2.1511.json.example              Example for vagrant boxes catalog metadata (one per OS)
+|   `-- CentOS-7.6.1810.json.example              Example for vagrant boxes catalog metadata (one per OS)
 |-- http/                                         HTTP server directory for Packer and metal PXE
 |   |-- ks.php                                    Kickstart entry point
 |   |-- includes/                                 Kickstart include files
 |   |   |-- header.php                            Parse incoming URL and set settings
 |   |   |-- repo.php                              Repository URLs for OSs
+|   |   |-- rootpw.php                            Crypted root password
 |   |   |-- metal/                                Metal specific Kickstart settings
 |   |   |   |-- disk.php
 |   |   |   |-- network.php
-|   |   |   |-- post.php
-|   |   |   `-- rootpw.php
+|   |   |   `-- post.php
 |   |   |-- virtual/                              VMs specific Kickstart settings
 |   |   |   |-- disk.php
 |   |   |   |-- network.php
-|   |   |   |-- post.php
-|   |   |   `-- rootpw.php
+|   |   |   `-- post.php
 |   `-- builds/                                   Per build type definitions
 |       |-- defaults.php                          Common defaults for all builds
 |       |-- virtual/
@@ -334,7 +331,7 @@ Following is a tree of files compromising the system along with a brief descript
 |   |-- main.json                                 Parallel template with all builds
 |   |-- site.json.example                         Example for site specific variables
 |   `-- os/                                       OS specific variables
-|       `-- CentOS-7.2.1511.json.example          Example of OS specific template
+|       `-- CentOS-7.6.1810.json.example          Example of OS specific template
 |-- test/                                         Vagrant tests
 |   `-- Vagrantfile
 `-- .gitignore                                    Files to ignore in VC
@@ -351,7 +348,7 @@ Before attempting to build images for any provider you should bootstrap the syst
 
 To bootstrap your site you set up some templates (find further information in [Packer Templates](#packer-templates)):
 - Set your site variables `templates/site.json`. An example is provided in `templates/site.json.example`
-- Set your OS variables `templates/os/`. An example is provided in `templates/os/CentOS-7.2.1511.json.example`
+- Set your OS variables `templates/os/`. An example is provided in `templates/os/CentOS-7.6.1810.json.example`
 
 You also need to set up private keys to access the images when booted on the different providers. These keys live in `keys/` and should not be committed to version control. To create both keys use:
 ``` sh
@@ -385,7 +382,7 @@ These builds depends on [VirtualBox](https://www.virtualbox.org). Most distribut
 
 ### vmware-iso
 
-VMware Player or [VMware Workstation](http://www.vmware.com/products/workstation-for-linux.html) is needed for builds that use the `vmware-iso` builder. Note that you might need to be registered at my.vmware.com to download the tools.
+[VMware Workstation](http://www.vmware.com/products/workstation-for-linux.html) or [VMware Player](https://www.vmware.com/products/workstation-player.html)+VMware VIX are needed for builds that use the `vmware-iso` builder. Note that you might need to be registered at https://my.vmware.com to download the tools. VMware VIX can be downloaded from VMware Player's download site by clicking on the "Drivers & Tools" tab. Note that VMWare 6.5+ changed it support for SHA from SHA1 to SHA256. If you are on an older version of VMware, you'll need to change the SHA algorithm `templates/site.json` to produce valid OVA files.
 
 ## Upload/Import tools
 
@@ -433,7 +430,7 @@ qemu-img is used to convert the Packer artifacts for the `azure` and `gcp` provi
 
 ### ovftool
 
-The Open Virtualization Format Tool (ovftool) is used to convert the Packer artifact for `vmware` from VMX to OVA format, which is needed to upload to VMware servers. Download ovftool from https://code.vmware.com/tool/ovf/4.1.0. Note that you will need to be registered at my.vmware.com. Documentation about ovftool can be found at https://www.vmware.com/support/developer/ovf.
+The Open Virtualization Format Tool (ovftool) is used to convert the Packer artifact for `vmware` from VMX to OVA format, which is needed to upload to VMware servers. Note that you will need to be registered at my.vmware.com to download ovftool. Follow these links to [download](https://code.vmware.com/tool/ovf) and access the [documentation](https://www.vmware.com/support/developer/ovf).
 
 ### virt-tar-out
 

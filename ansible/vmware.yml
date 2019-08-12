@@ -1,6 +1,6 @@
 ---
 - name: Install vmware tools
-  yum: name=open-vm-tools state=present enablerepo='*'
+  yum: name=open-vm-tools
 
 - name: Start vmtoolsd service
   service: name=vmtoolsd state=started enabled=yes

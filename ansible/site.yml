@@ -3,13 +3,21 @@
   hosts: all
   tasks:
     # Load variables from OS packer templates (variables overriden in command line will not be picked up)
-    - include_vars: name=packer_os file=../templates/os/{{ansible_distribution}}-{{ansible_distribution_version}}.json depth=no
+    - include_vars:
+        name: packer_os
+        file: ../templates/os/{{ansible_distribution}}-{{ansible_distribution_version}}.json
 
     # Common tasks to all builds
-    - include: tasks/repos.yml
-    - include: tasks/config_sshd.yml
-    - include: tasks/random_password.yml user=root
-    - include: tasks/ssh_keys.yml user=root key=packer
+    - import_tasks: tasks/repos.yml
+    - import_tasks: tasks/config_sshd.yml
+    - include_tasks: tasks/random_password.yml
+      vars:
+        user: root
+      when: packer_build_name != "vmware"
+    - include_tasks: tasks/ssh_keys.yml
+      vars:
+        user: root
+        key: packer
 
     # Build specific tasks
-    - include: '{{packer_build_name}}.yml'
+    - import_tasks: '{{packer_build_name}}.yml'

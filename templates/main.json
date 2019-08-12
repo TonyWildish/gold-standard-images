@@ -10,6 +10,9 @@
     "iso_server": null,
     "ks_server": null,
     "disk_size": "5120",
+    "root_pass": null,
+    "ssh_timeout": null,
+    "vmware_sha": null,
 
     "__comment": "Set these variables in OS specific templates or command line",
     "vm_name": null,
@@ -38,8 +41,8 @@
       "guest_additions_mode": "disable",
 
       "ssh_username": "root",
-      "ssh_password": "packer",
-      "ssh_timeout": "10m",
+      "ssh_password": "{{user `root_pass`}}",
+      "ssh_timeout": "{{user `ssh_timeout`}}",
 
       "shutdown_command": "shutdown -P now",
 
@@ -74,8 +77,8 @@
       "iso_checksum": "{{user `iso_checksum`}}",
 
       "ssh_username": "root",
-      "ssh_password": "packer",
-      "ssh_timeout": "10m",
+      "ssh_password": "{{user `root_pass`}}",
+      "ssh_timeout": "{{user `ssh_timeout`}}",
 
       "shutdown_command": "shutdown -P now",
 
@@ -106,8 +109,8 @@
       "iso_checksum": "{{user `iso_checksum`}}",
 
       "ssh_username": "root",
-      "ssh_password": "packer",
-      "ssh_timeout": "10m",
+      "ssh_password": "{{user `root_pass`}}",
+      "ssh_timeout": "{{user `ssh_timeout`}}",
 
       "shutdown_command": "shutdown -P now",
 
@@ -138,8 +141,8 @@
       "iso_checksum": "{{user `iso_checksum`}}",
 
       "ssh_username": "root",
-      "ssh_password": "packer",
-      "ssh_timeout": "10m",
+      "ssh_password": "{{user `root_pass`}}",
+      "ssh_timeout": "{{user `ssh_timeout`}}",
 
       "shutdown_command": "shutdown -P now",
 
@@ -170,8 +173,8 @@
       "iso_checksum": "{{user `iso_checksum`}}",
 
       "ssh_username": "root",
-      "ssh_password": "packer",
-      "ssh_timeout": "10m",
+      "ssh_password": "{{user `root_pass`}}",
+      "ssh_timeout": "{{user `ssh_timeout`}}",
 
       "shutdown_command": "shutdown -P now",
 
@@ -203,8 +206,8 @@
       "guest_additions_path": "/tmp/VBoxGuestAdditions.iso",
 
       "ssh_username": "root",
-      "ssh_password": "packer",
-      "ssh_timeout": "10m",
+      "ssh_password": "{{user `root_pass`}}",
+      "ssh_timeout": "{{user `ssh_timeout`}}",
 
       "shutdown_command": "shutdown -P now",
 
@@ -240,8 +243,8 @@
       "tools_upload_flavor": "",
 
       "ssh_username": "root",
-      "ssh_password": "packer",
-      "ssh_timeout": "10m",
+      "ssh_password": "{{user `root_pass`}}",
+      "ssh_timeout": "{{user `ssh_timeout`}}",
 
       "shutdown_command": "shutdown -P now",
 
@@ -328,7 +331,7 @@
         "OUTDIR=artifacts/{{user `version`}}/{{user `vm_name`}}/{{build_name}}",
         "OUTNAME={{user `vm_name`}}-{{user `version`}}_{{build_name}}"
       ],
-      "inline": ["ovftool --quiet --name=$OUTNAME --diskMode=thin --vCloudTemplate --compress=1 $OUTDIR/$OUTNAME.vmx $OUTDIR/$OUTNAME.ova"]
+      "inline": ["ovftool --quiet --name=$OUTNAME --diskMode=thin --vCloudTemplate --compress=1 --shaAlgorithm={{user `vmware_sha`}} $OUTDIR/$OUTNAME.vmx $OUTDIR/$OUTNAME.ova"]
     },
 
     {

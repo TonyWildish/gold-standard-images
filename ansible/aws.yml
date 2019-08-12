@@ -9,4 +9,4 @@
   failed_when: "'passwd: Success' not in last.stdout"
   register: last
 
-- include: tasks/cloud_init.yml
+- import_tasks: tasks/cloud_init.yml

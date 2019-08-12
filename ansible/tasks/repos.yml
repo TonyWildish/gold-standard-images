@@ -8,4 +8,4 @@
   with_items: '{{current_repos.files}}'
 
 - name: Add installation repository
-  yum_repository: name=packer description=packer enabled=no gpgcheck=no baseurl='{{packer_os.repo_server}}/{{ansible_distribution_version}}/os/$basearch'
+  yum_repository: name=packer description=packer enabled=yes gpgcheck=no baseurl='{{packer_os.repo_server}}/{{ansible_distribution_version}}/os/$basearch'

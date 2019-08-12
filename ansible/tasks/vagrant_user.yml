@@ -2,11 +2,16 @@
 - name: Add vagrant group
   group: name=vagrant state=present
 
-- name: Add vagrant user
+- name: Add vagrant user for RedHat 6 systems
+  user: name=vagrant group=vagrant group=vagrant groups=wheel,adm password=vagrant state=present
+  when: ansible_distribution_major_version <= '6'
+
+- name: Add vagrant user for RedHat 7 systems
   user: name=vagrant group=vagrant group=vagrant groups=wheel,adm,systemd-journal password=vagrant state=present
+  when: ansible_distribution_major_version > '6'
 
 - name: Install sudo
-  yum: name=sudo state=latest enablerepo='*'
+  yum: name=sudo
 
 - name: Add vagrant to sudoers
   template: dest=/etc/sudoers.d/vagrant src=templates/sudoers.j2 mode=0440 owner=root group=root
@@ -16,4 +21,6 @@
   template: dest=/etc/sudoers.d/vagrant_requiretty src=templates/sudoers_requiretty.j2 mode=0440 owner=root group=root
   with_items: ['vagrant']
 
-- include: ssh_keys.yml user=vagrant
+- include_tasks: ssh_keys.yml
+  vars:
+    user: vagrant

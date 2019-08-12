@@ -6,8 +6,3 @@ chmod -R u+rwX,go-rwx /root/.ssh
 # Disable Nouveau driver
 echo "blacklist nouveau" > /etc/modprobe.d/blacklist-nouveau.conf
 echo "options nouveau modeset=0" >> /etc/modprobe.d/blacklist-nouveau.conf
-
-# Eject cdrom
-if grep EJECT /proc/cmdline; then
-  eject /cdrom
-fi
