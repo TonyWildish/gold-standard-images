@@ -1,6 +1,6 @@
 #!/bin/bash
 
-packer_log=packer.log
+packer_log=packer.virtualbox.log
 [ -f $packer_log ] && cp /dev/null $packer_log
 
 set -ex
