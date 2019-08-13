@@ -6,5 +6,9 @@
   "disk_size": "8192",
   "lang": "en_US.UTF-8",
   "keyboard":  "us",
-  "timezone": "Europe/London"
+  "timezone": "UTC",
+  "root_pass": "password",
+  "root_salt": "salt",
+  "ssh_timeout": "20m",
+  "vmware_sha": "sha256"
 }

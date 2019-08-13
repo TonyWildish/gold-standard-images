@@ -235,6 +235,20 @@ As any other Packer template, `templates/main.json` is divided in:
 
 Kickstart files are located in the `http/` directory. The main kickstart file is `ks.php`, and requires a server running PHP (see [Kickstart server](#kickstart-server)).
 
+You can serve the kickstart files from your local directory using a PHP docker container:
+
+``` sh
+  docker run \
+    -it \
+    --detach \
+    --rm \
+    --name ks-server \
+    --volume `pwd`/http:/var/www/html \
+    --volume `pwd`/templates:/var/www/templates \
+    --publish 8080:80 \
+    php:7.3.2-apache-stretch
+  ```
+
 ### Packer Variables
 
 Packer site variables variables defined in `templates/site.json` and OS variables defined in `templates/os` are available in the kickstart in PHP objects `packer_site` and `packer_os`. Note that variables defined in the command line while running packer are not reflected here. Currently only `packer_os['os_version']` is used (see below).

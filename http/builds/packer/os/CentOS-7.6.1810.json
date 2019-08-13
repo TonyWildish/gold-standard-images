@@ -4,6 +4,6 @@
   "os_version": "7.6.1810",
   "iso": "CentOS-7-x86_64-NetInstall-1810",
   "iso_checksum": "19d94274ef856c4dfcacb2e7cfe4be73e442a71dd65cc3fb6e46db826040b56e",
-  "iso_server": "http://mirror.nextlayer.at/centos/",
-  "repo_server": "http://mirror.nextlayer.at/centos/7.6.1810/os/x86_64/Packages"
+  "iso_server": "http://mozart.ee.ic.ac.uk/CentOS/",
+  "repo_server": "http://mozart.ee.ic.ac.uk/CentOS"
 }

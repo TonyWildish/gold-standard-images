@@ -8,6 +8,7 @@ if (file_exists("includes/$hardware/bootline.php")) {
 
 install
 cmdline
+# text
 unsupported_hardware
 
 <?php require "includes/repo.php"; ?>
@@ -29,7 +30,7 @@ bootloader --location mbr --driveorder sda --append "rdblacklist=nouveau nouveau
 
 reboot
 
-%packages --nobase
+%packages
 @core
 man
 openssh-clients

@@ -9,7 +9,7 @@ if ($boot) {
 
 if ($lvm) {
   echo "part pv.01 --size 1 --grow --ondisk sda\n";
-  echo "volgroup ${hostname}_rootvg --pesize 32768 pv.01\n";
+  echo "volgroup ${hostname}_rootvg pv.01 --pesize 32768\n";
   if ($swap) {
     if ($swapsize == "recommended") {
       echo "logvol swap --fstype swap --name swap --vgname ${hostname}_rootvg --recommended\n";
