@@ -25,3 +25,5 @@ TAGS
 /templates/site.json
 /templates/os/*.json
 artifacts
+
+*.iso
