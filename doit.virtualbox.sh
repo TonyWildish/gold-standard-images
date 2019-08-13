@@ -5,6 +5,7 @@ packer_log=packer.virtualbox.log
 
 set -ex
 ksServer='ks-server'
+port=8080
 if [ `docker ps | grep $ksServer | wc -l` -eq 0 ]; then
   docker run \
     -it \
@@ -13,7 +14,7 @@ if [ `docker ps | grep $ksServer | wc -l` -eq 0 ]; then
     --name $ksServer \
     --volume `pwd`/http:/var/www/html \
     --volume `pwd`/templates:/var/www/templates \
-    --publish 8080:80 \
+    --publish $port:80 \
     php:7.3.2-apache-stretch
 fi
 
@@ -25,7 +26,7 @@ if [ "$KS_HOST_IP" != "" ]; then
 else
   # host_ip=`docker inspect -f "{{ .NetworkSettings.IPAddress }}" $ksServer`
   host_ip=`ifconfig | grep 'inet ' | egrep -v 127.0.0.1 | awk '{ print $2 }' | tail -1`
-  if [ `wget -O - "http://$host_ip:8080/ks.php?build=virtual/virtualbox&os=$image" | wc -l` -ne 0 ]; then
+  if [ `wget -O - "http://$host_ip:$port/ks.php?build=virtual/virtualbox&os=$image" | wc -l` -ne 0 ]; then
     echo "Found host IP $host_ip"
   else
     echo "Can't find kickstart host IP. If you're on a Mac, the candidates are:"
@@ -35,22 +36,25 @@ else
 fi
 
 base_url="http://mozart.ee.ic.ac.uk/CentOS"
-# base_url="http://mirror.nextlayer.at/centos"
-repo_server="$base_url/${version}/os/x86_64/Packages"
-iso_server="$base_url" #${version}/isos/x86_64"
+repo_server="$base_url"
+iso_server="$base_url"
 
-headless=true
+vb_version=`VBoxManage -v | awk -Fr '{ print $1 }'`
+vbga_iso="VBoxGuestAdditions_${vb_version}.iso"
+[ -f $vbga_iso ] || wget -O $vbga_iso https://download.virtualbox.org/virtualbox/${vb_version}/$vbga_iso
+headless=false
 PACKER_LOG=1 \
 packer build --force \
   -var-file=http/builds/packer/site.json \
   -var-file=http/builds/packer/os/$image.json \
   $opts \
   --only=virtualbox \
-  -var ks_server=http://$host_ip:8080/ \
+  -var ks_server=http://$host_ip:$port/ \
   -var headless=$headless \
-  -var guest_additions_path=/Applications/VirtualBox.app/Contents/MacOS/VBoxGuestAdditions.iso \
+  -var guest_additions_path=$vbga_iso \
   -var iso_server=$iso_server \
   -var repo_server=$repo_server \
   templates/main.json
 
+  # -var guest_additions_path=/Applications/VirtualBox.app/Contents/MacOS/VBoxGuestAdditions.iso \
 # echo qemu-img convert -p -O qcow2 source-image-file.vmdk converted-image-file.qcow2
