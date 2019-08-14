@@ -27,3 +27,5 @@ TAGS
 artifacts
 
 *.iso
+*.log
+mirrors*

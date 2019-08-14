@@ -1,7 +1,7 @@
 #!/bin/bash
 
-packer_log=packer.virtualbox.log
-[ -f $packer_log ] && cp /dev/null $packer_log
+export PACKER_LOG_PATH=packer.virtualbox.log
+[ -f $PACKER_LOG_PATH ] && cp /dev/null $PACKER_LOG_PATH
 
 set -ex
 ksServer='ks-server'
@@ -35,15 +35,21 @@ else
   fi
 fi
 
-base_url="http://mozart.ee.ic.ac.uk/CentOS"
-repo_server="$base_url"
-iso_server="$base_url"
+# centos_mirror="http://mozart.ee.ic.ac.uk/CentOS"
+if [ $RANDOM_MIRROR ]; then
+  CENTOS_MIRROR=`./get-centos-uk-mirror.sh`
+fi
+centos_mirror=${CENTOS_MIRROR:=http://mirror.nsc.liu.se/CentOS}
+repo_server=${REPO_SERVER:=$centos_mirror}
+iso_server=${ISO_SERVER:=$centos_mirror}
 
 vb_version=`VBoxManage -v | awk -Fr '{ print $1 }'`
 vbga_iso="VBoxGuestAdditions_${vb_version}.iso"
 [ -f $vbga_iso ] || wget -O $vbga_iso https://download.virtualbox.org/virtualbox/${vb_version}/$vbga_iso
-headless=false
-PACKER_LOG=1 \
+
+# opts="-on-error=ask -debug"
+export headless=true
+export PACKER_LOG=1
 packer build --force \
   -var-file=http/builds/packer/site.json \
   -var-file=http/builds/packer/os/$image.json \
@@ -56,5 +62,4 @@ packer build --force \
   -var repo_server=$repo_server \
   templates/main.json
 
-  # -var guest_additions_path=/Applications/VirtualBox.app/Contents/MacOS/VBoxGuestAdditions.iso \
 # echo qemu-img convert -p -O qcow2 source-image-file.vmdk converted-image-file.qcow2
