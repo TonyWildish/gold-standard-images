@@ -39,15 +39,28 @@ fi
 if [ $RANDOM_MIRROR ]; then
   CENTOS_MIRROR=`./get-centos-uk-mirror.sh`
 fi
-centos_mirror=${CENTOS_MIRROR:=http://mirror.nsc.liu.se/CentOS}
+centos_mirror=${CENTOS_MIRROR:=http://45.86.170.150/CentOS}
 repo_server=${REPO_SERVER:=$centos_mirror}
-iso_server=${ISO_SERVER:=$centos_mirror}
+iso_server=http://45.86.170.150/CentOS # "http://mozart.ee.ic.ac.uk/CentOS" #${ISO_SERVER:=$centos_mirror}
+
+template="templates/os/${image}.json.template"
+target="http/builds/packer/os/${image}.json"
+target2="templates/os/${image}.json"
+cat $template \
+  | sed -e "s%__REPO_SERVER__%$repo_server%g" \
+        -e "s%__ISO_SERVER__%$iso_server%g" \
+  | tee $target \
+  | tee $target2 \
+  > /dev/null
 
 vb_version=`VBoxManage -v | awk -Fr '{ print $1 }'`
 vbga_iso="VBoxGuestAdditions_${vb_version}.iso"
 [ -f $vbga_iso ] || wget -O $vbga_iso https://download.virtualbox.org/virtualbox/${vb_version}/$vbga_iso
 
 # opts="-on-error=ask -debug"
+# export ANSIBLE_DEBUG=1
+# export ANSIBLE_SSH_ARGS="-C -o ControlMaster=auto -o ControlPersist=60s"
+# export ANSIBLE_SSH_ARGS="-v $ANSIBLE_SSH_ARGS"
 export headless=true
 export PACKER_LOG=1
 packer build --force \
@@ -57,9 +70,4 @@ packer build --force \
   --only=virtualbox \
   -var ks_server=http://$host_ip:$port/ \
   -var headless=$headless \
-  -var guest_additions_path=$vbga_iso \
-  -var iso_server=$iso_server \
-  -var repo_server=$repo_server \
   templates/main.json
-
-# echo qemu-img convert -p -O qcow2 source-image-file.vmdk converted-image-file.qcow2
