@@ -9,6 +9,6 @@
   "timezone": "UTC",
   "root_pass": "password",
   "root_salt": "salt",
-  "ssh_timeout": "20m",
+  "ssh_timeout": "600m",
   "vmware_sha": "sha256"
 }
